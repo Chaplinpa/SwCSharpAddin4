@@ -574,15 +574,38 @@ namespace SwCSharpAddin4
             swDraw = (DrawingDoc)swModel;
             swView = swDraw.GetFirstView() as SolidWorks.Interop.sldworks.View;
 
+            //Traverse the drawing views, select each view, and set the referenced configuration to the coice selected on frmDrawConfigSwitch
             while (swView != null)
             {
                 retVal = swModel.Extension.SelectByID2(swView.Name, "DRAWINGVIEW", 0, 0, 0, false, 0, null, 0);
                 swView.ReferencedConfiguration = cfgName;
                 swView = swView.GetNextView();
             }
+
+            //Insert logic to determine if there is a BOM table associated with this drawing. Not entirely needed, but would help
+            //speed up the process by not having to loop the features below.
+                       
+            BomFeature swBOMFeat;
+            Feature swFeat = swModel.FirstFeature();
+            while (swFeat != null)
+            {
+                if (swFeat.GetTypeName2() == "BomFeat")
+                {
+                    string bomName = swFeat.Name;
+                    swBOMFeat = swFeat.GetSpecificFeature2();
+                    int cfgCount = swBOMFeat.GetConfigurationCount(true);
+                    swBOMFeat.ISetConfigurations(true, cfgCount, true, cfgName);
+
+                }
+                swFeat = swFeat.GetNextFeature();
+            }
+
+            swModel.ClearSelection2(true);
             swDraw.ForceRebuild();     
             
         }
+
+    
 
 
         public void ShowPMP()

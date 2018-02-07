@@ -30,6 +30,7 @@ namespace SwCSharpAddin4
         public void cmdOK_Click(object sender, EventArgs e) 
         {
             SwAddin.drwChangeConfig(cmbConfig.Text);
+            //SwAddin.drwUpdateBomTable(cmbConfig.Text);
             this.Close();
         }
 
